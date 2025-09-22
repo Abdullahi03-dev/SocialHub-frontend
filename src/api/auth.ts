@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000/auth";
+const API_URL = "https://socialhub-backend-se80.onrender.com/auth";
 
 export const register = async (name: string, email: string, password: string) => {
   try{

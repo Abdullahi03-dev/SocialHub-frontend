@@ -14,7 +14,7 @@ const Header = ({ isAuthenticated = false }: HeaderProps) => {
 
   const logout = async () => {
     try {
-      await axios.post("http://127.0.0.1:8000/logout", {}, { withCredentials: true });
+      await axios.post("https://socialhub-backend-se80.onrender.com/logout", {}, { withCredentials: true });
       localStorage.removeItem('email')
       toast.success("Logged out successfully");
       setTimeout(()=>{

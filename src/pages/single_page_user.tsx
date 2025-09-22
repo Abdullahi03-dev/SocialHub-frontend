@@ -64,7 +64,7 @@ const Profile = () => {
       if(!id) return navigate('/users')
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/getallpostsForUser/${id}`
+          `https://socialhub-backend-se80.onrender.com/getallpostsForUser/${id}`
         );
         setPosts(res.data);
       } catch (err) {
@@ -76,7 +76,7 @@ const Profile = () => {
       if(!id) return navigate('/users')
       try {
         const res = await axios.post(
-          "http://127.0.0.1:8000/auth/fetchbyemail/",
+          "https://socialhub-backend-se80.onrender.com/auth/fetchbyemail/",
           { id: id }
         );
         setUser(res.data);
@@ -115,7 +115,7 @@ const Profile = () => {
                             <AvatarImage
                               src={
                                 user?.image
-                                  ? "http://127.0.0.1:8000/" + user.image
+                                  ? "https://socialhub-backend-se80.onrender.com/" + user.image
                                   : undefined
                               }
                               alt={user?.name}

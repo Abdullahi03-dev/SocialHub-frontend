@@ -73,7 +73,7 @@ const Users = () => {
       if (!userDetails?.id) return; // only fetch if logged in
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/checkAdmin/${userDetails.id}`
+          `https://socialhub-backend-se80.onrender.com/checkAdmin/${userDetails.id}`
         );
         setIsAdmin(res.data.is_admin)
         // setPosts(res.data);
@@ -88,7 +88,7 @@ const Users = () => {
 
   const loadUsers = async () => {
     try {
-      const res = await axios.get<Users[]>("http://127.0.0.1:8000/users", {
+      const res = await axios.get<Users[]>("https://socialhub-backend-se80.onrender.com/users", {
 });
       setUsers(res.data);
       console.log(res.data)

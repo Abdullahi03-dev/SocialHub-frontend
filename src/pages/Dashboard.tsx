@@ -106,7 +106,7 @@ const Dashboard = () => {
 
 const fetchHashTags=async ()=>{
   try {
-    const res = await axios.get("http://127.0.0.1:8000/top-hashtags/");
+    const res = await axios.get("https://socialhub-backend-se80.onrender.com/top-hashtags/");
     // console.log(res.data)
     const flattags=res.data.map((tag:any)=>tag.split(',')).flat().map((tag:any)=>tag.trim())
     console.log(flattags)
@@ -118,7 +118,7 @@ const fetchHashTags=async ()=>{
 
 const fetchTopUsers=async ()=>{
   try {
-    const res = await axios.get("http://127.0.0.1:8000/top-users/");
+    const res = await axios.get("https://socialhub-backend-se80.onrender.com/top-users/");
     console.log(res.data);
     // setPosts(res.data);
     setActiveUsers(res.data)
@@ -149,7 +149,7 @@ useEffect(()=>{
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/getallposts/");
+        const res = await axios.get("https://socialhub-backend-se80.onrender.com/getallposts/");
         console.log(res.data)
         setPosts(res.data);
       } catch (err) {
@@ -191,7 +191,7 @@ useEffect(()=>{
       data.append("image", newPost.image);
     }
     try {
-      await axios.post("http://127.0.0.1:8000/upload", data, {
+      await axios.post("https://socialhub-backend-se80.onrender.com/upload", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Post uploaded successfully!");

@@ -59,7 +59,7 @@
 
 //   useEffect(() => {
 //     axios
-//       .get(`http://127.0.0.1:8000/getLiked/${post.id}/liked/${email}`)
+//       .get(`https://socialhub-backend-se80.onrender.com/getLiked/${post.id}/liked/${email}`)
 //       .then((res) => setLiked(res.data.liked))
 //       .catch((err) => console.error(err));
 //   }, [post.id, email]);
@@ -78,7 +78,7 @@
       
 //     setLiked(!liked);
 //     onLike?.(post.id);
-//       const res = await axios.post(`http://127.0.0.1:8000/posts/${post.id}/like/${email}`);
+//       const res = await axios.post(`https://socialhub-backend-se80.onrender.com/posts/${post.id}/like/${email}`);
 //       console.log(res.data.likes)
 //       // backend returns { "likes": number }
 //       setLiked(!liked);
@@ -129,7 +129,7 @@
 //         {post.image && (
 //           <div className="rounded-lg overflow-hidden">
 //             <img 
-//               src={'http://127.0.0.1:8000/'+post.image} 
+//               src={'https://socialhub-backend-se80.onrender.com/'+post.image} 
 //               alt="Post content" 
 //               className="w-full h-64 object-cover"
 //             />
@@ -273,7 +273,7 @@ const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
   // Check if the current user has liked the post
   useEffect(() => {
     axios
-      .get(`http://127.0.0.1:8000/getLiked/${post.id}/liked/${email}`)
+      .get(`https://socialhub-backend-se80.onrender.com/getLiked/${post.id}/liked/${email}`)
       .then((res) => {
         setLiked(res.data.liked);
       })
@@ -292,7 +292,7 @@ const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
     // Backend call
     try {
       await axios.post(
-        `http://127.0.0.1:8000/posts/${post.id}/like/${email}`
+        `https://socialhub-backend-se80.onrender.com/posts/${post.id}/like/${email}`
       );
     } catch (error) {
       console.error("Error toggling like:", error);
@@ -317,7 +317,7 @@ const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
             <AvatarImage
                 src={
                     post.user?.image
-                    ? "http://127.0.0.1:8000/" + post.user.image
+                    ? "https://socialhub-backend-se80.onrender.com/" + post.user.image
                     : undefined
                     }
              alt={post.user?.name}
@@ -352,7 +352,7 @@ const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
         {post.image && (
           <div className="rounded-lg overflow-hidden">
             <img
-              src={"http://127.0.0.1:8000/" + post.image}
+              src={"https://socialhub-backend-se80.onrender.com/" + post.image}
               alt="Post content"
               className="w-full h-64 object-cover"
             />

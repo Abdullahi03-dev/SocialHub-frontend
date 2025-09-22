@@ -63,7 +63,7 @@ const Profile = () => {
       if (!userDetails?.id) return; // only fetch if logged in
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/getallpostsForUser/${userDetails.id}`
+          `https://socialhub-backend-se80.onrender.com/getallpostsForUser/${userDetails.id}`
         );
         setPosts(res.data);
       } catch (err) {
@@ -75,7 +75,7 @@ const Profile = () => {
       if (!userDetails?.email) return;
       try {
         const res = await axios.post(
-          "http://127.0.0.1:8000/auth/fetchbyemail/",
+          "https://socialhub-backend-se80.onrender.com/auth/fetchbyemail/",
           { id: userDetails.id }
         );
         setUser(res.data);
@@ -114,7 +114,7 @@ const Profile = () => {
 
     try {
       await axios.put(
-        `http://127.0.0.1:8000/edit/editImage/${userDetails?.email}/upload-image`,
+        `https://socialhub-backend-se80.onrender.com/edit/editImage/${userDetails?.email}/upload-image`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -138,7 +138,7 @@ const Profile = () => {
     if (!userId) return;
     try {
       const response = await axios.put(
-        `http://127.0.0.1:8000/edit/editUser/${userId}`,
+        `https://socialhub-backend-se80.onrender.com/edit/editUser/${userId}`,
         formData
       );
       toast.success(response.data.message);
@@ -173,7 +173,7 @@ const Profile = () => {
                             <AvatarImage
                               src={
                                 user?.image
-                                  ? "http://127.0.0.1:8000/" + user.image
+                                  ? "https://socialhub-backend-se80.onrender.com/" + user.image
                                   : undefined
                               }
                               alt={user?.name}
