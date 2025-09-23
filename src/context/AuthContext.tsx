@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUser = async () => {
     try {
-      const res = await api.get("http://127.0.0.1:8000/auth/");
+      const res = await api.get("https://socialhub-backend-se80.onrender.com/auth/");
       setUserDetails(res.data);
     } catch {
         setUserDetails(null);
