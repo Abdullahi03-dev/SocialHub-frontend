@@ -72,11 +72,11 @@ const Profile = () => {
     };
 
     const fetchUser = async () => {
-      if (!userDetails?.email) return;
+      if (!userDetails?.id) return;
       try {
         const res = await axios.post(
           "https://socialhub-backend-se80.onrender.com/auth/fetchbyemail/",
-          { id: userDetails.id }
+          { id: userDetails?.id }
         );
         setUser(res.data);
         setFormData(res.data); // prefill form
