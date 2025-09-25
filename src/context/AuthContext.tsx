@@ -17,12 +17,13 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const API_URL=import.meta.env.VITE_API_URL
   const [userDetails, setUserDetails] = useState<User>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
     try {
-      const res = await api.get("https://socialhub-backend-se80.onrender.com/auth/");
+      const res = await api.get(`${API_URL}/auth/`);
       setUserDetails(res.data);
     } catch {
         setUserDetails(null);

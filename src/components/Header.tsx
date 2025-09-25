@@ -8,13 +8,14 @@ interface HeaderProps {
   onLogout?: () => void;
 }
 const Header = ({ isAuthenticated = false }: HeaderProps) => {
+  const API_URL=import.meta.env.VITE_API_URL
   const navigate = useNavigate();
   const location = useLocation();
 
 
   const logout = async () => {
     try {
-      await axios.post("https://socialhub-backend-se80.onrender.com/logout", {}, { withCredentials: true });
+      await axios.post(`${API_URL}`, {}, { withCredentials: true });
       localStorage.removeItem('email')
       toast.success("Logged out successfully");
       setTimeout(()=>{

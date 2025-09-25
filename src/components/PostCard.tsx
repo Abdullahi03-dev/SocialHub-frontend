@@ -266,6 +266,7 @@ interface PostCardProps {
 
 // Component
 const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
+  const API_URL=import.meta.env.VITE_API_URL
   const [newComment, setNewComment] = useState("");
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(post.likes);
@@ -273,7 +274,7 @@ const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
   // Check if the current user has liked the post
   useEffect(() => {
     axios
-      .get(`https://socialhub-backend-se80.onrender.com/getLiked/${post.id}/liked/${email}`)
+      .get(`${API_URL}/getLiked/${post.id}/liked/${email}`)
       .then((res) => {
         setLiked(res.data.liked);
       })
@@ -292,7 +293,7 @@ const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
     // Backend call
     try {
       await axios.post(
-        `https://socialhub-backend-se80.onrender.com/posts/${post.id}/like/${email}`
+        `${API_URL}/${post.id}/like/${email}`
       );
     } catch (error) {
       console.error("Error toggling like:", error);
@@ -317,7 +318,7 @@ const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
             <AvatarImage
                 src={
                     post.user?.image
-                    ? "https://socialhub-backend-se80.onrender.com/" + post.user.image
+                    ? `${API_URL}/` + post.user.image
                     : undefined
                     }
              alt={post.user?.name}
@@ -352,7 +353,7 @@ const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
         {post.image && (
           <div className="rounded-lg overflow-hidden">
             <img
-              src={"https://socialhub-backend-se80.onrender.com/" + post.image}
+              src={`${API_URL}/` + post.image}
               alt="Post content"
               className="w-full h-64 object-cover"
             />

@@ -45,6 +45,7 @@ interface Post {
 const Profile = () => {
   const {id}=useParams()
   const navigate = useNavigate();
+  const API_URL=import.meta.env.VITE_API_URL
 
   // State
   const [user, setUser] = useState<User | null>(null);
@@ -64,7 +65,7 @@ const Profile = () => {
       if(!id) return navigate('/users')
       try {
         const res = await axios.get(
-          `https://socialhub-backend-se80.onrender.com/getallpostsForUser/${id}`
+          `${API_URL}/getallpostsForUser/${id}`
         );
         setPosts(res.data);
       } catch (err) {
@@ -76,7 +77,7 @@ const Profile = () => {
       if(!id) return navigate('/users')
       try {
         const res = await axios.post(
-          "https://socialhub-backend-se80.onrender.com/auth/fetchbyemail/",
+          API_URL+"/auth/fetchbyemail/",
           { id: id }
         );
         setUser(res.data);
@@ -115,7 +116,7 @@ const Profile = () => {
                             <AvatarImage
                               src={
                                 user?.image
-                                  ? "https://socialhub-backend-se80.onrender.com/" + user.image
+                                  ? `${API_URL}/` + user.image
                                   : undefined
                               }
                               alt={user?.name}

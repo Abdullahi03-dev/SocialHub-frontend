@@ -2,99 +2,57 @@ import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import UserCard from "@/components/UserCard";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {  Users as UsersIcon } from "lucide-react";
+import { Users as UsersIcon } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-
 
 interface Users {
   id: string;
   name: string;
-  email:string;
-  role:string;
+  email: string;
+  role: string;
   created_at: string;
   posts: number;
-  isAdmin:boolean;
+  isAdmin: boolean;
 }
 
-
-// Mock data
-// const mockUsers = [
-//   {
-//     id: "1",
-//     name: "Sarah Johnson",
-//     email: "sarah.johnson@example.com",
-//     avatar: "https://images.unsplash.com/photo-1494790108755-2616b2e7cc5a?w=100&h=100&fit=crop&crop=face",
-//     role: "admin",
-//     joinDate: "Jan 2024",
-//     location: "San Francisco, CA",
-//     postsCount: 45,
-//     followersCount: 1234,
-//     followingCount: 567
-//   },
-//   {
-//     id: "2",
-//     name: "Mike Chen",
-//     email: "mike.chen@example.com",
-//     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-//     role: "user",
-//     joinDate: "Feb 2024",
-//     location: "New York, NY",
-//     postsCount: 23,
-//     followersCount: 456,
-//     followingCount: 234
-//   }
-// ];
-
 const Users = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   const [users, setUsers] = useState<Users[]>([]);
-  const [isMobile,setIsMobile]=useState(window.innerWidth<=768)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
-  const [isAdmin,setIsAdmin]=useState(false)
-
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const { userDetails } = useAuth();
 
-  // Fetch user + posts whenever userDetails changes
+  // Check if current user is admin
   useEffect(() => {
     const fetchIsAdmin = async () => {
-      if (!userDetails?.id) return; // only fetch if logged in
+      if (!userDetails?.id) return;
       try {
-        const res = await axios.get(
-          `https://socialhub-backend-se80.onrender.com/checkAdmin/${userDetails.id}`
-        );
-        setIsAdmin(res.data.is_admin)
-        // setPosts(res.data);
+        const res = await axios.get(`${API_URL}/checkAdmin/${userDetails.id}`);
+        setIsAdmin(res.data.is_admin);
       } catch (err) {
         console.error(err);
       }
     };
-
     fetchIsAdmin();
   }, [userDetails]);
 
-
+  // Fetch all users
   const loadUsers = async () => {
     try {
-      const res = await axios.get<Users[]>("https://socialhub-backend-se80.onrender.com/users", {
-});
+      const res = await axios.get<Users[]>(`${API_URL}/users`);
       setUsers(res.data);
-      console.log(res.data)
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load Users");
+      toast.error("Failed to load users");
+    } finally {
+      setDataLoaded(true);
     }
   };
 
@@ -102,54 +60,47 @@ const Users = () => {
     loadUsers();
   }, []);
 
-
-
+  // Delete user locally
   const handleDeleteUser = (userId: string) => {
     setUsers(users.filter(user => user.id !== userId));
   };
 
+  // Handle responsive view mode
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  useEffect(()=>{
-    const handleResize=()=>setIsMobile(window.innerWidth<=768)
-    window.addEventListener('resize',handleResize)
-    return ()=>window.removeEventListener('resize',handleResize)
-  },[])
-
-
-
-  useEffect(()=>{
-    if(!isMobile){
-      setViewMode('table')
-    }
-    else{
-      setViewMode("grid")
-    }
-  },[isMobile])
+  useEffect(() => {
+    setViewMode(isMobile ? "grid" : "table");
+  }, [isMobile]);
 
   const userStats = {
     total: users.length,
-    admins: users.filter(u => u.role === 'admin').length,
+    admins: users.filter(u => u.role === "admin").length,
   };
 
+  if (!dataLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-xl font-semibold">Loading users...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background ">
+    <div className="min-h-screen bg-background">
       <Header isAuthenticated={true} />
-      
       <div className="flex">
         <Sidebar />
-        
         <main className="md:ml-34 ml-20">
           <div className="container py-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-8">
               <div>
                 <h1 className="font-heading text-3xl font-bold">Users</h1>
-                <p className="text-muted-foreground mt-1">
-                  Manage and view all platform users
-                </p>
-              </div>
-              
-              <div className="flex items-center gap-2">
+                <p className="text-muted-foreground mt-1">Manage and view all platform users</p>
               </div>
             </div>
 
@@ -166,7 +117,7 @@ const Users = () => {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardContent className="py-4 px-2">
                   <div className="flex items-center justify-between">
@@ -181,15 +132,15 @@ const Users = () => {
             </div>
 
             {/* Users Display */}
-            {viewMode === "grid"?(
+            {viewMode === "grid" ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {users.map((user) => (
+                {users.map(user => (
                   <UserCard
                     key={user.id}
                     user={user}
                     onDelete={handleDeleteUser}
                     isAdmin={isAdmin}
-                    showDeleteButton={user.role !== 'admin'}
+                    showDeleteButton={user.role !== "admin"}
                   />
                 ))}
               </div>
@@ -207,19 +158,16 @@ const Users = () => {
                           <th className="py-4 px-6 text-left font-medium">Role</th>
                           <th className="py-4 px-6 text-left font-medium">Joined</th>
                           <th className="py-4 px-6 text-left font-medium">Posts</th>
-                          {isAdmin&&(
-                          <th className="py-4 px-6 text-left font-medium">Actions</th>
-
-                          )}
+                          {isAdmin && <th className="py-4 px-6 text-left font-medium">Actions</th>}
                         </tr>
                       </thead>
                       <tbody>
-                        {users.map((user) => (
+                        {users.map(user => (
                           <UserCard
                             key={user.id}
                             user={user}
                             onDelete={handleDeleteUser}
-                            showDeleteButton={user.role !== 'admin'}
+                            showDeleteButton={user.role !== "admin"}
                             isAdmin={isAdmin}
                             variant="table"
                           />

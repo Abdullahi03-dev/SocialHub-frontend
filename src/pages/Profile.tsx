@@ -43,70 +43,51 @@ interface Post {
 
 // Main Component
 const Profile = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
+  const { userDetails, loading } = useAuth();
 
-  // State
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", bio: "", location: "" });
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  // File input reference (for avatar upload)
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Auth Context
-  const { userDetails, loading } = useAuth();
-
-  // Fetch user + posts whenever userDetails changes
   useEffect(() => {
-  // if (loading) return; // wait for auth to finish loading
+    if (!userDetails?.id) return;
 
-  // if (!userDetails?.id) {
-  //   alert("ID not available");
-  //   return;
-  // }
+    const fetchUserAndPosts = async () => {
+      try {
+        const userRes = await axios.get(`${API_URL}/auth/fetchbyemail/${userDetails.id}`, {
+          withCredentials: true,
+        });
+        setUser(userRes.data);
+        setFormData(userRes.data);
 
-  // alert(`Using ID: ${userDetails.email}`);
+        const postsRes = await axios.get(`${API_URL}/getallpostsForUser/${userDetails.id}`, {
+          withCredentials: true,
+        });
+        setPosts(postsRes.data);
+      } catch (err) {
+        console.error("Error fetching profile or posts:", err);
+      } finally {
+        setDataLoaded(true);
+      }
+    };
 
-  const fetchUserAndPosts = async () => {
-    try {
-      //  Fetch profile by ID
-      const userRes = await axios.get(
-        `https://socialhub-backend-se80.onrender.com/auth/fetchbyemail/2`,
-        { withCredentials: true }
-      );
-      setUser(userRes.data);
-      setFormData(userRes.data);
+    fetchUserAndPosts();
+  }, [userDetails?.id]);
 
-      //  Fetch posts
-      const postsRes = await axios.get(
-        `https://socialhub-backend-se80.onrender.com/getallpostsForUser/${userDetails.id}`,
-        { withCredentials: true }
-      );
-      setPosts(postsRes.data);
-    } catch (err) {
-      console.error("Error fetching profile or posts:", err);
-    }
-  };
-
-  fetchUserAndPosts();
-}, [userDetails?.id, loading]);
-
-
-
-
-
-  // Handle hidden file input trigger
   const handleIconClick = () => {
     fileInputRef.current?.click();
   };
 
-  // Handle file upload (avatar)
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    // Basic validation
     if (!selectedFile.type.startsWith("image/")) {
       toast.error("Please select a valid image (PNG, JPG, JPEG)");
       return;
@@ -120,11 +101,9 @@ const Profile = () => {
     formData.append("file", selectedFile);
 
     try {
-      await axios.put(
-        `https://socialhub-backend-se80.onrender.com/edit/editImage/${userDetails?.email}/upload-image`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      await axios.put(`${API_URL}/edit/editImage/${userDetails?.email}/upload-image`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       toast.success("Image uploaded successfully!");
       setTimeout(() => navigate(0), 200);
     } catch (error) {
@@ -133,21 +112,14 @@ const Profile = () => {
     }
   };
 
-  // Handle form changes (edit profile dialog)
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle profile update
   const handleSubmit = async (userId?: number) => {
     if (!userId) return;
     try {
-      const response = await axios.put(
-        `https://socialhub-backend-se80.onrender.com/edit/editUser/${userId}`,
-        formData
-      );
+      const response = await axios.put(`${API_URL}/edit/editUser/${userId}`, formData);
       toast.success(response.data.message);
       setTimeout(() => navigate(0), 100);
     } catch (error: any) {
@@ -155,219 +127,151 @@ const Profile = () => {
     }
   };
 
-  // --- Return UI ---
+  if (!dataLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-xl font-semibold">Loading profile...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header isAuthenticated={true} />
       <div className="flex">
         <Sidebar />
-
         <main className="md:ml-24">
           <div className="container py-8">
-            {/*  Loader */}
-            {loading &&userDetails? (
-              <p>Loading...</p>
-            ) : (
-              <>
-                {/* Profile Header */}
-                <Card className="mb-8">
-                  <CardContent className="p-8">
-                    <div className="flex flex-col md:flex-row gap-8">
-                      {/* Avatar + Upload */}
-                      <div className="flex flex-col items-center md:items-start">
-                        <div className="relative">
-                          <Avatar className="h-32 w-32 mb-4">
-                            <AvatarImage
-                              src={
-                                user?.image
-                                  ? "https://socialhub-backend-se80.onrender.com/" + user.image
-                                  : undefined
-                              }
-                              alt={user?.name}
-                            />
-                            {user?.name && (
-                              <AvatarFallback className="gradient-primary font-bold">
-                                <h3 className="text-4xl">
-                                  {user.name.charAt(0).toUpperCase()}
-                                  {user.name.charAt(1).toUpperCase()}
-                                </h3>
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-
-                          {/* File Input it should be (hidden) */}
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            ref={fileInputRef}
-                            style={{ display: "none" }}
-                            onChange={handleFileChange}
-                          />
-
-                          {/* Camera Icon Trigger */}
-                          <Camera
-                            size={40}
-                            className="h-7 w-7 absolute bottom-0 right-0 cursor-pointer"
-                            onClick={handleIconClick}
-                          />
-                        </div>
-
-                        {/* Edit Profile Dialog */}
-                        <Dialog
-                          open={isEditDialogOpen}
-                          onOpenChange={setIsEditDialogOpen}
-                        >
-                          <DialogTrigger asChild>
-                            <Button variant="outline" className="btn-secondary">
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit Profile
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-lg">
-                            <DialogHeader>
-                              <DialogTitle>Edit Profile</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div>
-                                <label className="text-sm font-medium">Name</label>
-                                <Input
-                                  name="name"
-                                  value={formData.name}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                              <div>
-                                <label className="text-sm font-medium">Bio</label>
-                                <Textarea
-                                  name="bio"
-                                  value={formData.bio}
-                                  onChange={handleChange}
-                                  className="min-h-[100px] resize-none"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-sm font-medium">
-                                  Location
-                                </label>
-                                <Input
-                                  name="location"
-                                  value={formData.location}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                              <div className="flex gap-2 justify-end">
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setIsEditDialogOpen(false)}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  onClick={() => handleSubmit(user?.id)}
-                                  className="btn-hero"
-                                >
-                                  Save Changes
-                                </Button>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-
-                      {/* User Details */}
-                      <div className="flex-1 space-y-4">
-                        <div>
-                          <h1 className="font-heading text-3xl font-bold">
-                            {user?.name}
-                          </h1>
-                          <p className="text-muted-foreground text-lg">
-                            @{user?.name}
-                          </p>
-                        </div>
-
-                        <p className="text-foreground leading-relaxed">
-                          {user?.bio}
-                        </p>
-
-                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-2" />
-                            {user?.location}
-                          </div>
-                          <div className="flex items-center">
-                            <Badge
-                              variant={
-                                user?.role === "admin" ? "default" : "secondary"
-                              }
-                              className={
-                                user?.role === "admin"
-                                  ? "gradient-primary text-white"
-                                  : ""
-                              }
-                            >
-                              {user?.role}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center">
-                            <Mail className="h-4 w-4 mr-2" />
-                            {user?.email}
-                          </div>
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            {user?.created_at && (
-                              <h3>Joined: {user.created_at.split("T")[0]}</h3>
-                            )}
-                          </div>
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            <h3 className="font-bold text-black">
-                              Posts {user?.posts}
+            <Card className="mb-8">
+              <CardContent className="p-8">
+                <div className="flex flex-col md:flex-row gap-8">
+                  <div className="flex flex-col items-center md:items-start">
+                    <div className="relative">
+                      <Avatar className="h-32 w-32 mb-4">
+                        <AvatarImage src={user?.image ? `${API_URL}/` + user.image : undefined} alt={user?.name} />
+                        {user?.name && (
+                          <AvatarFallback className="gradient-primary font-bold">
+                            <h3 className="text-4xl">
+                              {user.name.charAt(0).toUpperCase()}
+                              {user.name.charAt(1).toUpperCase()}
                             </h3>
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={handleFileChange}
+                      />
+
+                      <Camera
+                        size={40}
+                        className="h-7 w-7 absolute bottom-0 right-0 cursor-pointer"
+                        onClick={handleIconClick}
+                      />
+                    </div>
+
+                    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="btn-secondary">
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit Profile
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-lg">
+                        <DialogHeader>
+                          <DialogTitle>Edit Profile</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium">Name</label>
+                            <Input name="name" value={formData.name} onChange={handleChange} />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Bio</label>
+                            <Textarea name="bio" value={formData.bio} onChange={handleChange} className="min-h-[100px] resize-none" />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Location</label>
+                            <Input name="location" value={formData.location} onChange={handleChange} />
+                          </div>
+                          <div className="flex gap-2 justify-end">
+                            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                              Cancel
+                            </Button>
+                            <Button onClick={() => handleSubmit(user?.id)} className="btn-hero">
+                              Save Changes
+                            </Button>
                           </div>
                         </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+
+                  <div className="flex-1 space-y-4">
+                    <div>
+                      <h1 className="font-heading text-3xl font-bold">{user?.name}</h1>
+                      <p className="text-muted-foreground text-lg">@{user?.name}</p>
+                    </div>
+                    <p className="text-foreground leading-relaxed">{user?.bio}</p>
+                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 mr-2" />
+                        {user?.location}
+                      </div>
+                      <div className="flex items-center">
+                        <Badge variant={user?.role === "admin" ? "default" : "secondary"} className={user?.role === "admin" ? "gradient-primary text-white" : ""}>
+                          {user?.role}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center">
+                        <Mail className="h-4 w-4 mr-2" />
+                        {user?.email}
+                      </div>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        {user?.created_at && <h3>Joined: {user.created_at.split("T")[0]}</h3>}
+                      </div>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        <h3 className="font-bold text-black">Posts {user?.posts}</h3>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-                {/* Tabs Section */}
-                <Tabs defaultValue="posts" className="space-y-6">
-                  <TabsList className="grid w-full max-w-md grid-cols-2">
-                    <TabsTrigger value="posts">Posts</TabsTrigger>
-                    <TabsTrigger value="liked">Liked</TabsTrigger>
-                  </TabsList>
+            <Tabs defaultValue="posts" className="space-y-6">
+              <TabsList className="grid w-full max-w-md grid-cols-2">
+                <TabsTrigger value="posts">Posts</TabsTrigger>
+                <TabsTrigger value="liked">Liked</TabsTrigger>
+              </TabsList>
 
-                  {/* Posts Tab */}
-                  <TabsContent value="posts" className="space-y-6">
-                    <h2 className="font-heading text-xl font-semibold">
-                      Your Posts
-                    </h2>
+              <TabsContent value="posts" className="space-y-6">
+                <h2 className="font-heading text-xl font-semibold">Your Posts</h2>
+                <div className="space-y-6">
+                  {posts.map((post: any) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      email={`${userDetails?.email}`}
+                      onLike={(id) => console.log("Like", id)}
+                      onComment={(id, c) => console.log("Comment", id, c)}
+                    />
+                  ))}
+                </div>
+              </TabsContent>
 
-                    <div className="space-y-6">
-                      {/* {} */}
-                      {posts.map((post: any) => (
-                        <PostCard
-                          key={post.id}
-                          post={post}
-                          email={`${userDetails?.email}`}
-                          onLike={(id) => console.log("Like", id)}
-                          onComment={(id, c) => console.log("Comment", id, c)}
-                        />
-                      ))}
-                    </div>
-                  </TabsContent>
-
-                  {/* Liked Tab */}
-                  <TabsContent value="liked" className="space-y-6">
-                    <div className="text-center py-12">
-                      <p className="text-muted-foreground">
-                        Posts you&apos;ve liked will appear here.
-                      </p>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </>
-            )}
+              <TabsContent value="liked" className="space-y-6">
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">Posts you&apos;ve liked will appear here.</p>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>

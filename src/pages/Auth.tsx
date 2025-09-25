@@ -5,7 +5,9 @@ import { login, register } from "@/api/auth";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+
 const Auth = () => {
+  // const API_URL=process.env.API_URL
   const navigate=useNavigate()
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
