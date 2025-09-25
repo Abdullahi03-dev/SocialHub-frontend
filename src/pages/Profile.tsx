@@ -45,7 +45,7 @@ interface Post {
 const Profile = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-  const { userDetails, loading } = useAuth();
+  const { userDetails } = useAuth();
 
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
