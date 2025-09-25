@@ -66,7 +66,7 @@ const Profile = () => {
     return;
   }
 
-  alert(`Using ID: ${userDetails.id}`);
+  alert(`Using ID: ${userDetails.email}`);
 
   const fetchUserAndPosts = async () => {
     try {
