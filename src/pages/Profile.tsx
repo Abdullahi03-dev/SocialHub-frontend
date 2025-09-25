@@ -61,6 +61,7 @@ const Profile = () => {
   useEffect(() => {
   // Only run if we actually have a valid user ID
   if (!userDetails?.id) return;
+    alert(userDetails.id)
 
   const fetchUserAndPosts = async () => {
     try {
