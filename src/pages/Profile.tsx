@@ -59,11 +59,16 @@ const Profile = () => {
 
   // Fetch user + posts whenever userDetails changes
   useEffect(() => {
-  if (!userDetails?.id) return;
+  if (!userDetails?.id) {
+    alert("ID not available");
+    return;
+  }
+
+  alert(`Using ID: ${userDetails.id}`);
 
   const fetchUserAndPosts = async () => {
     try {
-      // Fetch profile by ID in URL
+      //  Fetch profile by ID
       const userRes = await axios.get(
         `https://socialhub-backend-se80.onrender.com/auth/fetchbyemail/${userDetails.id}`,
         { withCredentials: true }
@@ -84,6 +89,7 @@ const Profile = () => {
 
   fetchUserAndPosts();
 }, [userDetails?.id]);
+
 
 
 
