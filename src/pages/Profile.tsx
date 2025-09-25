@@ -59,17 +59,14 @@ const Profile = () => {
 
   // Fetch user + posts whenever userDetails changes
   useEffect(() => {
-  // Only run if we actually have a valid user ID
-  if (!userDetails?.id) return toast.error('errr');
-    alert(userDetails.id)
+  if (!userDetails?.id) return;
 
   const fetchUserAndPosts = async () => {
     try {
-      // Fetch profile
-      const userRes = await axios.post(
-        "https://socialhub-backend-se80.onrender.com/auth/fetchbyemail",
-        { id: userDetails.id }, // send guaranteed ID
-        { withCredentials: true } // include cookies (important for auth)
+      // Fetch profile by ID in URL
+      const userRes = await axios.get(
+        `https://socialhub-backend-se80.onrender.com/auth/fetchbyemail/${userDetails.id}`,
+        { withCredentials: true }
       );
       setUser(userRes.data);
       setFormData(userRes.data);
@@ -87,6 +84,7 @@ const Profile = () => {
 
   fetchUserAndPosts();
 }, [userDetails?.id]);
+
 
 
   // Handle hidden file input trigger
