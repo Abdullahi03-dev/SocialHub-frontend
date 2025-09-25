@@ -60,7 +60,7 @@ const Profile = () => {
   // Fetch user + posts whenever userDetails changes
   useEffect(() => {
   // Only run if we actually have a valid user ID
-  if (!userDetails?.id) return;
+  if (!userDetails?.id) return toast.error('errr');
     alert(userDetails.id)
 
   const fetchUserAndPosts = async () => {
