@@ -59,35 +59,34 @@ const Profile = () => {
 
   // Fetch user + posts whenever userDetails changes
   useEffect(() => {
-    const fetchPosts = async () => {
-      if (!userDetails?.id) return; // only fetch if logged in
-      try {
-        const res = await axios.get(
-          `https://socialhub-backend-se80.onrender.com/getallpostsForUser/${userDetails.id}`
-        );
-        setPosts(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+  // Only run if we actually have a valid user ID
+  if (!userDetails?.id) return;
 
-    const fetchUser = async () => {
-      if (!userDetails?.id) return;
-      try {
-        const res = await axios.post(
-          "https://socialhub-backend-se80.onrender.com/auth/fetchbyemail/",
-          { id: userDetails?.id }
-        );
-        setUser(res.data);
-        setFormData(res.data); // prefill form
-      } catch (err) {
-        console.error(err);
-      }
-    };
+  const fetchUserAndPosts = async () => {
+    try {
+      // Fetch profile
+      const userRes = await axios.post(
+        "https://socialhub-backend-se80.onrender.com/auth/fetchbyemail",
+        { id: userDetails.id }, // send guaranteed ID
+        { withCredentials: true } // include cookies (important for auth)
+      );
+      setUser(userRes.data);
+      setFormData(userRes.data);
 
-    fetchUser();
-    fetchPosts();
-  }, [userDetails]);
+      // Fetch posts
+      const postsRes = await axios.get(
+        `https://socialhub-backend-se80.onrender.com/getallpostsForUser/${userDetails.id}`,
+        { withCredentials: true }
+      );
+      setPosts(postsRes.data);
+    } catch (err) {
+      console.error("Error fetching profile or posts:", err);
+    }
+  };
+
+  fetchUserAndPosts();
+}, [userDetails?.id]);
+
 
   // Handle hidden file input trigger
   const handleIconClick = () => {
