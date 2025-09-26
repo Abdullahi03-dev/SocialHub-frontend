@@ -1,44 +1,69 @@
+// src/api/auth.ts
 import axios from "axios";
 
-// const API_URL = "https://socialhub-backend-se80.onrender.com/auth";
-const API_URL=import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 
+// -------------------
+// REGISTER
+// -------------------
 export const register = async (name: string, email: string, password: string) => {
-  // const API_URL=process.env.API_URL
-  try{
-    const res=axios.post(`${API_URL}/auth/signup`, { name, email, password },{
-      headers:{
-        "Content-Type":"application/json"
-      }
-    });
-    
-    return (await res).data
-  }catch(e:any){
-    throw e.response?.data?.detail||'SIGNUP FAILED'
+  try {
+    const res = await axios.post(
+      `${API_URL}/auth/signup`,
+      { name, email, password },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    return res.data;
+  } catch (e: any) {
+    throw e.response?.data?.detail || "SIGNUP FAILED";
   }
-
 };
 
+// -------------------
+// LOGIN
+// -------------------
 export const login = async (email: string, password: string) => {
-  try{
-   await axios.post(`${API_URL}/auth/signin`, { email, password },{ withCredentials: true });
-  }catch(error:any){
-    throw error.response?.data?.detail||'Login FAILED'
+  try {
+    const res = await axios.post(
+      `${API_URL}/auth/signin`,
+      { email, password },
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    // ✅ Store JWT from backend response
+    if (res.data?.token) {
+      localStorage.setItem("token", res.data.token);
+    }
+
+    return res.data;
+  } catch (e: any) {
+    throw e.response?.data?.detail || "LOGIN FAILED";
   }
-  
 };
 
-
-
+// -------------------
+// CHECK AUTH
+// -------------------
 export const checkAuth = async (): Promise<boolean> => {
   try {
-    const res = await axios.get(`${API_URL}/auth/check-auth`, { withCredentials: true });
-    return res.data.authenticated;
+    const token = localStorage.getItem("token");
+    if (!token) return false;
+
+    const res = await axios.get(`${API_URL}/auth/details`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return !!res.data;
   } catch {
     return false;
   }
 };
 
-// export const getToken = () => localStorage.getItem("token");
-// export const logout = () => localStorage.removeItem("token");
-
+// -------------------
+// LOGOUT HELPER
+// -------------------
+// export const logout = () => {
+//   localStorage.removeItem("token");
+// };
