@@ -59,17 +59,18 @@ const Profile = () => {
 
   useEffect(() => {
     // make sure email exists
-  
+  if (!savedEmail) return; 
+      alert(`email:${savedEmail}`)
     const fetchUserAndPosts = async () => {
-      if (!savedEmail) return; 
+      
       try {
-        // fetch user by query parameter
+        // fetch user by query parametser
         const userRes = await axios.get(`${API_URL}/auth/fetchbyemail`, {
           params: { email: savedEmail },
           withCredentials: true,
         });
-        alert(savedEmail)
-        console.log(userRes.data)
+        alert(`email:${savedEmail}`)
+        console.log('datasssss',userRes.data)
         setUser(userRes.data);
         setFormData(userRes.data);
   
