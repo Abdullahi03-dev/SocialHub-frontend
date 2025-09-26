@@ -12,7 +12,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { Label } from "@radix-ui/react-label";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
 
 interface FormDataType {
   content: string;
@@ -32,8 +31,7 @@ const Dashboard = () => {
   const [activeUsers, setActiveUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // const savedEmail = localStorage.getItem("email");
-  const { userDetails } = useAuth();
+  const savedEmail=localStorage.getItem('email')
 
   // Fetch hashtags
   const fetchHashTags = async () => {
@@ -95,10 +93,10 @@ const Dashboard = () => {
 
   // Handle post submission
   const handleSubmit = async () => {
-    if (!userDetails?.email) return toast.error("Account Not Found, Sign in Again.");
+    if (!savedEmail) return toast.error("Account Not Found, Sign in Again.");
 
     const data = new FormData();
-    data.append("email", userDetails.email);
+    data.append("email",savedEmail);
     data.append("content", newPost.content);
     data.append("tags", newPost.tags);
     if (newPost.image) data.append("image", newPost.image);
@@ -205,12 +203,12 @@ const Dashboard = () => {
 
                 {/* Posts Feed */}
                 <div className="space-y-6">
-                  {filteredPosts.length > 0 && userDetails?.email ? (
+                  {filteredPosts.length > 0 && savedEmail? (
                     filteredPosts.map((post: any) => (
                       <PostCard
                         key={post.id}
                         post={post}
-                        email={userDetails.email}
+                        email={savedEmail}
                         onLike={handleLikePost}
                         onComment={handleCommentPost}
                       />

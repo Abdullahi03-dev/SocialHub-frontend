@@ -14,7 +14,7 @@ import { Edit, MapPin, Calendar, Mail, Camera } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+// import { useAuth } from "@/context/AuthContext";
 
 // Types
 interface User {
@@ -41,61 +41,63 @@ interface Post {
   user: User;
 }
 
-// Main Component
 const Profile = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-  const { userDetails } = useAuth();
-  console.log(userDetails?.id)
-
+  // const { userDetails } = useAuth();
+  
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", bio: "", location: "" });
   const [dataLoaded, setDataLoaded] = useState(false);
-
+  
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const savedEmail=localStorage.getItem('email')
+  const savedEmail = localStorage.getItem("email");
 
+  // Fetch user profile and posts
   useEffect(() => {
-    // make sure email exists
-  if (!savedEmail) {
-    alert('error no email?')
-  }; 
-      alert(`email:${savedEmail}`)
+    if (!savedEmail) {
+      alert("Error: no email found in localStorage");
+      return;
+    }
+
     const fetchUserAndPosts = async () => {
-      
       try {
-        // fetch user by query parametser
+        // Fetch user details
         const userRes = await axios.get(`${API_URL}/auth/fetchbyemail`, {
           params: { email: savedEmail },
           withCredentials: true,
         });
-        alert(`email:${savedEmail}`)
-        console.log('datasssss',userRes.data)
         setUser(userRes.data);
-        setFormData(userRes.data);
-  
-        // fetch posts by email
+        setFormData({
+          name: userRes.data.name || "",
+          bio: userRes.data.bio || "",
+          location: userRes.data.location || "",
+        });
+
+        // Fetch user posts
         const postsRes = await axios.get(`${API_URL}/getallpostsForUser/${savedEmail}`, {
           withCredentials: true,
         });
         setPosts(postsRes.data);
       } catch (err) {
         console.error("Error fetching profile or posts:", err);
+        toast.error("Failed to fetch profile or posts");
       } finally {
         setDataLoaded(true);
       }
     };
-  
+
     fetchUserAndPosts();
   }, [savedEmail]);
-  
 
+  // Open file input for avatar
   const handleIconClick = () => {
     fileInputRef.current?.click();
   };
 
+  // Handle avatar image upload
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
@@ -109,29 +111,40 @@ const Profile = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
+    const uploadForm = new FormData();
+    uploadForm.append("file", selectedFile);
 
     try {
-      await axios.put(`${API_URL}/edit/editImage/${savedEmail}/upload-image`, formData, {
+      await axios.put(`${API_URL}/edit/editImage/${savedEmail}/upload-image`, uploadForm, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      toast.success("Image uploaded successfully!");
+      toast.success("Image uploaded successfully");
       setTimeout(() => navigate(0), 200);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to upload image!");
+      toast.error("Failed to upload image");
     }
   };
 
+  // Handle form input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Update user details (only send fields that changed)
   const handleSubmit = async (userId?: number) => {
     if (!userId) return;
+
     try {
-      const response = await axios.put(`${API_URL}/edit/editUser/${userId}`, formData);
+      // Prepare payload only with fields that are not empty
+      const payload: Record<string, string> = {};
+      if (formData.name) payload.name = formData.name;
+      if (formData.bio) payload.bio = formData.bio;
+      if (formData.location) payload.location = formData.location;
+
+      const response = await axios.put(`${API_URL}/edit/editUser/${userId}`, payload, {
+        withCredentials: true,
+      });
       toast.success(response.data.message);
       setTimeout(() => navigate(0), 100);
     } catch (error: any) {
@@ -157,10 +170,11 @@ const Profile = () => {
             <Card className="mb-8">
               <CardContent className="p-8">
                 <div className="flex flex-col md:flex-row gap-8">
+                  {/* Avatar and Edit Dialog */}
                   <div className="flex flex-col items-center md:items-start">
                     <div className="relative">
                       <Avatar className="h-32 w-32 mb-4">
-                        <AvatarImage src={user?.image ? `${API_URL}/` + user.image : undefined} alt={user?.name} />
+                        <AvatarImage src={user?.image ? `${API_URL}/${user.image}` : undefined} alt={user?.name} />
                         {user?.name && (
                           <AvatarFallback className="gradient-primary font-bold">
                             <h3 className="text-4xl">
@@ -200,29 +214,26 @@ const Profile = () => {
                         <div className="space-y-4">
                           <div>
                             <label className="text-sm font-medium">Name</label>
-                            <Input name="name" value={formData.name} onChange={handleChange} />
+                            <Input name="name" value={formData.name} onChange={handleChange} placeholder={user?.name} />
                           </div>
                           <div>
                             <label className="text-sm font-medium">Bio</label>
-                            <Textarea name="bio" value={formData.bio} onChange={handleChange} className="min-h-[100px] resize-none" />
+                            <Textarea name="bio" value={formData.bio} onChange={handleChange} className="min-h-[100px] resize-none" placeholder={user?.bio} />
                           </div>
                           <div>
                             <label className="text-sm font-medium">Location</label>
-                            <Input name="location" value={formData.location} onChange={handleChange} />
+                            <Input name="location" value={formData.location} onChange={handleChange} placeholder={user?.location} />
                           </div>
                           <div className="flex gap-2 justify-end">
-                            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                              Cancel
-                            </Button>
-                            <Button onClick={() => handleSubmit(user?.id)} className="btn-hero">
-                              Save Changes
-                            </Button>
+                            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+                            <Button onClick={() => handleSubmit(user?.id)} className="btn-hero">Save Changes</Button>
                           </div>
                         </div>
                       </DialogContent>
                     </Dialog>
                   </div>
 
+                  {/* User Info */}
                   <div className="flex-1 space-y-4">
                     <div>
                       <h1 className="font-heading text-3xl font-bold">{user?.name}</h1>
@@ -257,6 +268,7 @@ const Profile = () => {
               </CardContent>
             </Card>
 
+            {/* Tabs for posts */}
             <Tabs defaultValue="posts" className="space-y-6">
               <TabsList className="grid w-full max-w-md grid-cols-2">
                 <TabsTrigger value="posts">Posts</TabsTrigger>
@@ -270,7 +282,7 @@ const Profile = () => {
                     <PostCard
                       key={post.id}
                       post={post}
-                      email={`${savedEmail}`}
+                      email={savedEmail || ""}
                       onLike={(id) => console.log("Like", id)}
                       onComment={(id, c) => console.log("Comment", id, c)}
                     />
@@ -280,7 +292,7 @@ const Profile = () => {
 
               <TabsContent value="liked" className="space-y-6">
                 <div className="text-center py-12">
-                  <p className="text-muted-foreground">Posts you&apos;ve liked will appear here.</p>
+                  <p className="text-muted-foreground">Posts you've liked will appear here.</p>
                 </div>
               </TabsContent>
             </Tabs>

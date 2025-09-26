@@ -14,7 +14,7 @@ import {  MapPin, Calendar, Mail } from "lucide-react";
 import axios from "axios";
 // import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+// import { useAuth } from "@/context/AuthContext";
 
 // Types
 interface User {
@@ -43,7 +43,7 @@ interface Post {
 
 // Main Component
 const Profile = () => {
-  const {id}=useParams()
+  const {savedEmail}=useParams()
   const navigate = useNavigate();
   const API_URL=import.meta.env.VITE_API_URL
 
@@ -57,15 +57,15 @@ const Profile = () => {
   // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Auth Context
-  const { userDetails, loading } = useAuth();
+  // const { userDetails, loading } = useAuth();
 
   // Fetch user + posts whenever userDetails changes
   useEffect(() => {
     const fetchPosts = async () => {
-      if(!id) return navigate('/users')
+      if(!savedEmail) return navigate('/users')
       try {
         const res = await axios.get(
-          `${API_URL}/getallpostsForUser/${id}`
+          `${API_URL}/getallpostsForUser/${savedEmail}`
         );
         setPosts(res.data);
       } catch (err) {
@@ -74,11 +74,11 @@ const Profile = () => {
     };
 
     const fetchUser = async () => {
-      if(!id) return navigate('/users')
+      if(!savedEmail) return navigate('/users')
       try {
         const res = await axios.post(
           API_URL+"/auth/fetchbyemail/",
-          { id: id }
+          { email: savedEmail }
         );
         setUser(res.data);
         // setFormData(res.data); // prefill form
@@ -89,7 +89,7 @@ const Profile = () => {
 
     fetchUser();
     fetchPosts();
-  }, [userDetails]);
+  }, [savedEmail]);
 
   // --- Return UI ---
   return (
@@ -101,7 +101,7 @@ const Profile = () => {
         <main className="md:ml-24">
           <div className="container py-8">
             {/*  Loader */}
-            {loading &&userDetails? (
+            {savedEmail? (
               <p>Loading...</p>
             ) : (
               <>
@@ -213,7 +213,7 @@ const Profile = () => {
                         <PostCard
                           key={post.id}
                           post={post}
-                          email={`${userDetails?.email}`}
+                          email={`${savedEmail}`}
                           onLike={(id) => console.log("Like", id)}
                           onComment={(id, c) => console.log("Comment", id, c)}
                         />

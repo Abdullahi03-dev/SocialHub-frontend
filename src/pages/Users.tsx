@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users as UsersIcon } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useAuth } from "@/context/AuthContext";
+// import { useAuth } from "@/context/AuthContext";
 
 interface Users {
   id: string;
@@ -26,22 +26,23 @@ const Users = () => {
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [isAdmin, setIsAdmin] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const savedEmail = localStorage.getItem("email");
 
-  const { userDetails } = useAuth();
+  // const { userDetails } = useAuth();
 
   // Check if current user is admin
   useEffect(() => {
     const fetchIsAdmin = async () => {
-      if (!userDetails?.id) return;
+      if (!savedEmail) return;
       try {
-        const res = await axios.get(`${API_URL}/checkAdmin/${userDetails.id}`);
+        const res = await axios.get(`${API_URL}/checkAdmin/${savedEmail}`);
         setIsAdmin(res.data.is_admin);
       } catch (err) {
         console.error(err);
       }
     };
     fetchIsAdmin();
-  }, [userDetails]);
+  }, [savedEmail]);
 
   // Fetch all users
   const loadUsers = async () => {

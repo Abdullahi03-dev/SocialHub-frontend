@@ -40,7 +40,7 @@ const App = () => (
          
           }
           />
-          <Route path="/singlepage/:id" element={
+          <Route path="/singlepage/:savedEmail" element={
             <ProtectedRoute>
               <Single_page_user />
             </ProtectedRoute>
@@ -50,13 +50,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
   </>
-  // <QueryClientProvider client={queryClient}>
-    // <TooltipProvider>
-      // <Toaster />
-      // <Sonner />
-      
-    // {/* </TooltipProvider> */}
-  // </QueryClientProvider>
+
 );
 
 export default App;
