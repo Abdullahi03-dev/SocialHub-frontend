@@ -60,7 +60,7 @@ const Profile = () => {
   useEffect(() => {
     // if (!userDetails?.id) return;
     if (!savedEmail) return
-
+    alert(savedEmail)
     const fetchUserAndPosts = async () => {
       try {
         const userRes = await axios.get(`${API_URL}/auth/fetchbyemail/${savedEmail}`, {
