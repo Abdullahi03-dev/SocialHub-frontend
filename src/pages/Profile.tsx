@@ -59,7 +59,9 @@ const Profile = () => {
 
   useEffect(() => {
     // make sure email exists
-  if (!savedEmail) return; 
+  if (!savedEmail) {
+    alert('error no email?')
+  }; 
       alert(`email:${savedEmail}`)
     const fetchUserAndPosts = async () => {
       
