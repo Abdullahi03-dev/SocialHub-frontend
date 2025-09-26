@@ -58,17 +58,19 @@ const Profile = () => {
   const savedEmail=localStorage.getItem('email')
 
   useEffect(() => {
-    // if (!userDetails?.id) return;
-    if (!savedEmail) return
-    alert(savedEmail)
+    if (!savedEmail) return; // make sure email exists
+  
     const fetchUserAndPosts = async () => {
       try {
-        const userRes = await axios.get(`${API_URL}/auth/fetchbyemail/${savedEmail}`, {
+        // fetch user by query parameter
+        const userRes = await axios.get(`${API_URL}/auth/fetchbyemail`, {
+          params: { email: savedEmail },
           withCredentials: true,
         });
         setUser(userRes.data);
         setFormData(userRes.data);
-
+  
+        // fetch posts by email
         const postsRes = await axios.get(`${API_URL}/getallpostsForUser/${savedEmail}`, {
           withCredentials: true,
         });
@@ -79,9 +81,10 @@ const Profile = () => {
         setDataLoaded(true);
       }
     };
-
+  
     fetchUserAndPosts();
   }, [savedEmail]);
+  
 
   const handleIconClick = () => {
     fileInputRef.current?.click();
