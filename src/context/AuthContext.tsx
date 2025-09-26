@@ -21,25 +21,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userDetails, setUserDetails] = useState<User>(null);
   const [loading, setLoading] = useState(true);
 
-  //  get user details if token exists
   const fetchUser = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setUserDetails(null);
-        setLoading(false);
-        return;
-      }
-
-      const res = await api.get("/auth/details", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      const res = await api.get("/auth/details"); // ✅ relative path
       setUserDetails(res.data);
     } catch (err) {
       console.error("Failed to fetch user:", err);
       setUserDetails(null);
-      localStorage.removeItem("token"); // clear invalid token
     } finally {
       setLoading(false);
     }

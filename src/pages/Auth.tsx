@@ -20,6 +20,7 @@ const Auth = () => {
         console.log(name,email,password)
         await register(name,email,password);
         toast.success('SIGN UP SUCCESSFULL')
+        localStorage.setItem('email',email)
         setTimeout(()=>{
       navigate(0);
         },2000)

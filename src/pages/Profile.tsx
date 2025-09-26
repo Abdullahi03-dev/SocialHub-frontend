@@ -46,6 +46,7 @@ const Profile = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { userDetails } = useAuth();
+  console.log(userDetails?.id)
 
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -54,19 +55,21 @@ const Profile = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const savedEmail=localStorage.getItem('email')
 
   useEffect(() => {
-    if (!userDetails?.id) return;
+    // if (!userDetails?.id) return;
+    if (!savedEmail) return
 
     const fetchUserAndPosts = async () => {
       try {
-        const userRes = await axios.get(`${API_URL}/auth/fetchbyemail/${userDetails.id}`, {
+        const userRes = await axios.get(`${API_URL}/auth/fetchbyemail/${savedEmail}`, {
           withCredentials: true,
         });
         setUser(userRes.data);
         setFormData(userRes.data);
 
-        const postsRes = await axios.get(`${API_URL}/getallpostsForUser/${userDetails.id}`, {
+        const postsRes = await axios.get(`${API_URL}/getallpostsForUser/${savedEmail}`, {
           withCredentials: true,
         });
         setPosts(postsRes.data);
@@ -78,7 +81,7 @@ const Profile = () => {
     };
 
     fetchUserAndPosts();
-  }, [userDetails?.id]);
+  }, [savedEmail]);
 
   const handleIconClick = () => {
     fileInputRef.current?.click();
@@ -101,7 +104,7 @@ const Profile = () => {
     formData.append("file", selectedFile);
 
     try {
-      await axios.put(`${API_URL}/edit/editImage/${userDetails?.email}/upload-image`, formData, {
+      await axios.put(`${API_URL}/edit/editImage/${savedEmail}/upload-image`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Image uploaded successfully!");
@@ -258,7 +261,7 @@ const Profile = () => {
                     <PostCard
                       key={post.id}
                       post={post}
-                      email={`${userDetails?.email}`}
+                      email={`${savedEmail}`}
                       onLike={(id) => console.log("Like", id)}
                       onComment={(id, c) => console.log("Comment", id, c)}
                     />
