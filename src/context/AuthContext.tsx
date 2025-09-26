@@ -1,3 +1,4 @@
+// src/context/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/axios";
 
@@ -17,16 +18,16 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const API_URL=import.meta.env.VITE_API_URL
   const [userDetails, setUserDetails] = useState<User>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
     try {
-      const res = await api.get(`${API_URL}/auth/details`);
+      const res = await api.get("/auth/details"); // ✅ relative path
       setUserDetails(res.data);
-    } catch {
-        setUserDetails(null);
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+      setUserDetails(null);
     } finally {
       setLoading(false);
     }
