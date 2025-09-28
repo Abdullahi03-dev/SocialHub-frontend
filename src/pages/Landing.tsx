@@ -120,12 +120,12 @@ const Landing = () => {
         <div className="container">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why Choose SocialHub?</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto px-6">
               Everything you need to build meaningful connections and share your story
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 px-3">
             {features.map((feature, index) => (
               <Card key={index} className="card-interactive hover-lift">
                 <CardContent className="p-6 text-center">

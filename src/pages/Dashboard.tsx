@@ -30,8 +30,9 @@ const Dashboard = () => {
   const [hashTagsAnalytics, setHashTagsAnalytics] = useState<string[]>([]);
   const [activeUsers, setActiveUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false); // loader state for post
 
-  const savedEmail=localStorage.getItem('email')
+  const savedEmail = localStorage.getItem("email");
 
   // Fetch hashtags
   const fetchHashTags = async () => {
@@ -95,13 +96,19 @@ const Dashboard = () => {
   const handleSubmit = async () => {
     if (!savedEmail) return toast.error("Account Not Found, Sign in Again.");
 
+    // Validation
+    if (!newPost.content.trim() || !newPost.tags.trim() || !newPost.image) {
+      return toast.error("Please fill in content, tags, and select an image.");
+    }
+
     const data = new FormData();
-    data.append("email",savedEmail);
+    data.append("email", savedEmail);
     data.append("content", newPost.content);
     data.append("tags", newPost.tags);
     if (newPost.image) data.append("image", newPost.image);
 
     try {
+      setSubmitting(true);
       await axios.post(`${API_URL}/upload`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -110,6 +117,8 @@ const Dashboard = () => {
     } catch (error) {
       console.error(error);
       toast.error("Upload failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -165,7 +174,7 @@ const Dashboard = () => {
                         />
                         <Label className="py-3">Image</Label>
                         <Input
-                          placeholder="Choose your image (optional)"
+                          placeholder="Choose your image"
                           accept="image/*"
                           type="file"
                           onChange={handleFileChange}
@@ -181,8 +190,8 @@ const Dashboard = () => {
                           <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                             Cancel
                           </Button>
-                          <Button onClick={handleSubmit} className="btn-hero">
-                            Post
+                          <Button onClick={handleSubmit} className="btn-hero" disabled={submitting}>
+                            {submitting ? "Posting..." : "Post"}
                           </Button>
                         </div>
                       </div>
@@ -203,12 +212,12 @@ const Dashboard = () => {
 
                 {/* Posts Feed */}
                 <div className="space-y-6">
-                  {filteredPosts.length > 0 && savedEmail? (
+                  {filteredPosts.length > 0 && savedEmail ? (
                     filteredPosts.map((post: any) => (
                       <PostCard
                         key={post.id}
                         post={post}
-                        email={savedEmail}
+                        email={`${savedEmail}`}
                         onLike={handleLikePost}
                         onComment={handleCommentPost}
                       />

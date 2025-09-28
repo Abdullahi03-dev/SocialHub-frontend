@@ -43,7 +43,7 @@ const Header = ({ isAuthenticated = false }: HeaderProps) => {
           <span className="font-heading text-xl font-bold">SocialHub</span>
         </Link>
 
-        <nav className="flex items-center space-x-4">
+        <nav className="flex items-center space-x-4 pr-5">
           {isAuthenticated ? (
             <>
               <Link to="/dashboard">
@@ -51,20 +51,6 @@ const Header = ({ isAuthenticated = false }: HeaderProps) => {
                   Dashboard
                 </Button>
               </Link>
-
-
-
-              {/* <Link to="/users">
-                <Button variant="ghost" size="sm">
-                  Users
-                </Button>
-              </Link> */}
-              {/* <Link to="/profile">
-                <Button variant="ghost" size="sm">
-                  <User className="h-4 w-4 mr-2" />
-                  Profile
-                </Button>
-              </Link> */}
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -84,7 +70,7 @@ const Header = ({ isAuthenticated = false }: HeaderProps) => {
                   </Button>
                 </Link>
               )}
-              <Link to="/auth">
+              <Link to="/auth?mode=signin">
                 <Button variant="outline" size="sm">
                   Login
                 </Button>

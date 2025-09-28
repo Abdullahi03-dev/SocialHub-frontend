@@ -220,190 +220,72 @@
 
 
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Send } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import axios from "axios";
-
-// Types
-interface Comment {
-  id: string;
-  author: string;
-  avatar: string;
-  content: string;
-  timestamp: string;
-}
-
-interface User {
-  name: string;
-  role: string;
-  image:string
-}
-
-interface Post {
-  id: string;
-  author: string;
-  avatar: string;
-  content: string;
-  image?: string;
-  timestamp: string;
-  likes: number;
-  comments: Comment[];
-  hashtags?: string;
-  user: User;
-}
 
 interface PostCardProps {
-  post: Post;
-  email: string;
-  onLike?: (postId: string) => void;
-  onComment?: (postId: string, comment: string) => void;
+   post: Post; 
+   email: string; 
+   onLike?: (postId: string) => void; 
+   onComment?: (postId: string, comment: string) => void; 
 }
 
-// Component
-const PostCard = ({ post, onLike, onComment, email }: PostCardProps) => {
-  const API_URL=import.meta.env.VITE_API_URL
-  const [newComment, setNewComment] = useState("");
-  const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(post.likes);
+interface Post { id: string; author: string; avatar: string; content: string; image?: string; timestamp: string; likes: number; comments: Comment[]; hashtags?: string; user: User; }
 
-  // Check if the current user has liked the post
-  useEffect(() => {
-    axios
-      .get(`${API_URL}/getLiked/${post.id}/liked/${email}`)
-      .then((res) => {
-        setLiked(res.data.liked);
-      })
-      .catch((err) => console.error(err));
-  }, [post.id, email]);
+interface User { name: string; role: string; image:string }
+const API_URL = import.meta.env.VITE_API_URL;
 
-  // Toggle like
-  const handleLike = async () => {
-    // Temporary UI update
-    setLiked(!liked);
-    setLikes((prev) => (liked ? prev - 1 : prev + 1));
-
-    // Trigger parent callback
-    onLike?.(post.id);
-
-    // Backend call
-    try {
-      await axios.post(
-        `${API_URL}/${post.id}/like/${email}`
-      );
-    } catch (error) {
-      console.error("Error toggling like:", error);
-    }
-  };
-
-  // Convert hashtags string to array
-  const stringsToArray = (str: string) => str.split(",");
-
-  // Handle comment submission
-  const handleComment = () => {
-    if (!newComment.trim()) return;
-    onComment?.(post.id, newComment);
-    setNewComment("");
-  };
-
+export default function PostCard({ post }: PostCardProps) {
   return (
-    <Card className="card-post hover-lift w-[750px]">
+    <Card className="card-post hover-lift w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto">
 
-      <CardHeader className="flex-row items-start space-y-0 space-x-4 pb-4">
+      {/* Header */}
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pb-4">
         <Avatar className="h-10 w-10">
-            <AvatarImage
-                src={
-                    post.user?.image
-                    ? `${API_URL}/` + post.user.image
-                    : undefined
-                    }
-             alt={post.user?.name}
-                            />
-                    {post.user?.name && (
-                       <AvatarFallback className="gradient-primary font-bold">
-                      {post.user.name.charAt(0).toUpperCase()}
-                      {post.user.name.charAt(1).toUpperCase()}
-                            </AvatarFallback>
-                            )}
-                          </Avatar>
+          <AvatarImage
+            src={post.user?.image ? `${API_URL}/` + post.user.image : undefined}
+            alt={post.user?.name}
+          />
+          {post.user?.name && (
+            <AvatarFallback className="gradient-primary font-bold">
+              {post.user.name.charAt(0).toUpperCase()}
+              {post.user.name.charAt(1).toUpperCase()}
+            </AvatarFallback>
+          )}
+        </Avatar>
 
-        <div className="flex-1 space-y-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-semibold">{post.user.name}</h4>
-              <Badge
-                variant={post.user.role === "admin" ? "default" : "secondary"}
-                className={post.user.role === "admin" ? "gradient-primary text-white" : ""}
-              >
-                {post.user.role}
-              </Badge>
-            </div>
-          </div>
+        <div className="flex-1">
+          <h4 className="font-semibold text-sm sm:text-base">{post.user.name}</h4>
+          <Badge
+            variant={post.user.role === "admin" ? "default" : "secondary"}
+            className={post.user.role === "admin" ? "gradient-primary text-white" : ""}
+          >
+            {post.user.role}
+          </Badge>
         </div>
       </CardHeader>
 
-      {/* Post Content: Text + Image + Hashtags */}
+      {/* Content */}
       <CardContent className="space-y-4">
-        <p className="text-foreground leading-relaxed">{post.content}</p>
+        {/* Text content */}
+        <p className="text-sm sm:text-base break-words">{post.content}</p>
 
+        {/* Image content (responsive) */}
         {post.image && (
-          <div className="rounded-lg overflow-hidden">
+          <div className="w-full flex justify-center">
             <img
               src={`${API_URL}/` + post.image}
-              alt="Post content"
-              className="w-full h-64 object-cover"
+              alt="Post"
+              className="rounded-lg w-full max-h-96 object-cover"
             />
           </div>
         )}
-
-        {post.hashtags && (
-          <div className="flex flex-wrap gap-2">
-            {stringsToArray(post.hashtags).map((tag, idx) => (
-              <Badge key={idx} variant="secondary">
-                #{tag}
-              </Badge>
-            ))}
-          </div>
-        )}
       </CardContent>
-
-      {/* Post Footer: Likes + Comments */}
-      <CardFooter className="flex space-y-4">
-        <div className="flex items-center justify-items-start">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLike}
-            className={liked ? "text-red-500 hover:text-red-600" : ""}
-          >
-            <Heart className={`h-4 w-4 mr-1 ${liked ? "fill-current" : ""}`} />
-            {likes}
-          </Button>
-        </div>
-
-        {/* Optional comment section */}
-        {false && (
-          <div className="w-full space-y-4">
-            <div className="flex space-x-2">
-              <Textarea
-                placeholder="Write a comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className="min-h-[80px] resize-none"
-              />
-              <Button onClick={handleComment} disabled={!newComment.trim()} size="sm">
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        )}
-      </CardFooter>
     </Card>
   );
-};
-
-export default PostCard;
+}
