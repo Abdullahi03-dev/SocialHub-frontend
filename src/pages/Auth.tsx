@@ -23,6 +23,7 @@ const Auth = () => {
         localStorage.setItem('email',email)
         setTimeout(()=>{
       navigate('/auth?mode=signin');
+      navigate(0)
         },2000)
       }catch(e:any){
         toast.error(e||'SIGNUP FAILED')
