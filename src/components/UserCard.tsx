@@ -20,20 +20,33 @@ interface UserCardProps {
   onDelete?: (userId: string) => void;
   showDeleteButton?: boolean;
   variant?: "card" | "table";
-  isAdmin:boolean;
+  isAdmin: boolean;
 }
 
-const UserCard = ({ user, onDelete, showDeleteButton = false, variant = "card",isAdmin }: UserCardProps) => {
-  const navigate=useNavigate()
+const UserCard = ({
+  user,
+  onDelete,
+  showDeleteButton = false,
+  variant = "card",
+  isAdmin,
+}: UserCardProps) => {
+  const navigate = useNavigate();
+
   const handleDelete = () => {
     if (onDelete) {
       onDelete(user.id);
     }
   };
 
+  // Table variant (unchanged)
   if (variant === "table") {
     return (
-      <tr className="border-b border-border hover:bg-secondary/50 transition-smooth cursor-pointer" onClick={()=>{navigate('/singlepage/'+user.id)}}>
+      <tr
+        className="border-b border-border hover:bg-secondary/50 transition-smooth cursor-pointer"
+        onClick={() => {
+          navigate("/singlepage/" + user.id);
+        }}
+      >
         <td className="py-4 px-6">
           <div className="flex items-center space-x-3">
             <Avatar className="h-10 w-10">
@@ -46,22 +59,19 @@ const UserCard = ({ user, onDelete, showDeleteButton = false, variant = "card",i
           </div>
         </td>
         <td className="py-4 px-6">
-          <Badge 
-            variant={user.role === 'admin' ? 'default' : 'secondary'}
-            className={user.role === 'admin' ? 'gradient-primary text-white' : ''}
+          <Badge
+            variant={user.role === "admin" ? "default" : "secondary"}
+            className={user.role === "admin" ? "gradient-primary text-white" : ""}
           >
             {user.role}
           </Badge>
         </td>
-  
         <td className="py-4 px-6 text-sm text-muted-foreground">
           {user.created_at}
         </td>
-        <td className="py-4 px-6 text-sm text-muted-foreground">
-          {user.posts}
-        </td>
+        <td className="py-4 px-6 text-sm text-muted-foreground">{user.posts}</td>
         <td className="py-4 px-6">
-          {showDeleteButton &&isAdmin&& (
+          {showDeleteButton && isAdmin && (
             <Button
               variant="outline"
               size="sm"
@@ -76,42 +86,57 @@ const UserCard = ({ user, onDelete, showDeleteButton = false, variant = "card",i
     );
   }
 
+  // Card variant (improved for mobile)
   return (
-    <Card className="card-interactive hover-lift w-[270px]">
-      <CardHeader className="text-center pb-4">
-        <Avatar className="h-20 w-20 mx-auto mb-4">
+    <Card className="card-interactive hover-lift w-[280px] sm:w-[300px]">
+      <CardHeader className="flex flex-col items-center pb-4">
+        {/* Avatar */}
+        <Avatar className="h-20 w-20 mb-3">
           <AvatarImage src={user.avatar} alt={user.name} />
-          <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
+          <AvatarFallback className="text-2xl">
+            {user.name.charAt(0)}
+          </AvatarFallback>
         </Avatar>
-        <h3 className="font-heading text-xl font-semibold">{user.name}</h3>
-        <Badge 
-          variant={user.role === 'admin' ? 'default' : 'secondary'}
-          className={user.role === 'admin' ? 'gradient-primary text-white' : ''}
+
+        {/* Name */}
+        <h3 className="font-heading text-lg sm:text-xl font-semibold text-center">
+          {user.name}
+        </h3>
+
+        {/* Role badge */}
+        <Badge
+          variant={user.role === "admin" ? "default" : "secondary"}
+          className={`mt-2 ${
+            user.role === "admin" ? "gradient-primary text-white" : ""
+          }`}
         >
           {user.role}
         </Badge>
+
+        {/* Email */}
+        <p className="mt-2 text-sm text-muted-foreground flex items-center">
+          <Mail className="h-4 w-4 mr-2" />
+          <span className="truncate">{user.email}</span>
+        </p>
       </CardHeader>
 
-      <CardContent className="space-y-3">
-        <div className="flex items-center text-sm text-muted-foreground">
-          <Mail className="h-4 w-4 mr-2" />
-          {user.email}
-        </div>
-        <div className="flex items-center text-sm text-muted-foreground">
+      <CardContent className="space-y-3 text-center">
+        {/* Joined Date */}
+        <div className="flex items-center justify-center text-sm text-muted-foreground">
           <Calendar className="h-4 w-4 mr-2" />
-          Joined {user.created_at}
+          Joined {user.created_at.split("T")[0]}
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols gap-4 pt-4 border-t border-border">
-          <div className="text-center">
+        <div className="grid grid-cols-1 gap-4 pt-4 border-t border-border">
+          <div>
             <p className="font-semibold">{user.posts}</p>
             <p className="text-xs text-muted-foreground">Posts</p>
           </div>
         </div>
       </CardContent>
 
-      {showDeleteButton &&isAdmin&& (
+      {showDeleteButton && isAdmin && (
         <CardFooter>
           <Button
             variant="outline"

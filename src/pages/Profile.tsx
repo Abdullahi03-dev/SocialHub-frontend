@@ -141,7 +141,6 @@ const Profile = () => {
   const handleSubmit = async (userId?: number) => {
     if (!userId) return;
 
-    // Validation
     if (!formData.name || !formData.bio || !formData.location) {
       toast.error("All fields must be filled before saving");
       return;
@@ -183,7 +182,7 @@ const Profile = () => {
       <Header isAuthenticated={true} />
 
       <div className="flex">
-        {/* Sidebar (always visible, responsive widths) */}
+        {/* Sidebar */}
         <aside
           className="fixed top-0 left-0 h-screen bg-white border-r shadow-sm
                      w-16 sm:w-20 md:w-24 lg:w-64 flex flex-col"
@@ -191,26 +190,23 @@ const Profile = () => {
           <Sidebar />
         </aside>
 
-        {/* Main content (adjusts margin for sidebar) */}
+        {/* Main content */}
         <main className="flex-1 ml-16 sm:ml-20 md:ml-24 lg:ml-64">
-          <div className="container py-6 px-4 sm:px-6 lg:px-8">
+          <div className="container py-6 px-4 sm:px-6 lg:px-8 max-w-6xl">
             {/* Profile Card */}
-            <Card className="mb-8">
+            <Card className="mb-8 max-w-3xl">
               <CardContent className="p-6 sm:p-8">
-                <div className="flex flex-col items-center gap-8">
-                  {/* Avatar always on top */}
-                  <div className="flex flex-col items-center">
-                    <div className="relative z-0">
-                      <Avatar className="h-28 w-28 sm:h-32 sm:w-32 mb-4 z-0">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:gap-8">
+                  {/* Avatar */}
+                  <div className="flex flex-col items-center sm:items-start">
+                    <div className="relative">
+                      <Avatar className="h-28 w-28 sm:h-32 sm:w-32 mb-4">
                         <AvatarImage
-                          src={
-                            user?.image ? `${API_URL}/${user.image}` : undefined
-                          }
+                          src={user?.image ? `${API_URL}/${user.image}` : undefined}
                           alt={user?.name}
-                          className="z-"
                         />
                         {user?.name && (
-                          <AvatarFallback className="gradient-primary font-bold text-3xl sm:text-4xl z-0">
+                          <AvatarFallback className="gradient-primary font-bold text-3xl sm:text-4xl">
                             {user.name.charAt(0).toUpperCase()}
                             {user.name.charAt(1).toUpperCase()}
                           </AvatarFallback>
@@ -227,7 +223,7 @@ const Profile = () => {
 
                       <Camera
                         size={28}
-                        className="h-6 w-6 sm:h-7 sm:w-7 absolute bottom-0 right-0 cursor-pointer z-0"
+                        className="h-6 w-6 sm:h-7 sm:w-7 absolute bottom-0 right-0 cursor-pointer"
                         onClick={handleIconClick}
                       />
                     </div>
@@ -271,9 +267,7 @@ const Profile = () => {
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-medium">
-                              Location
-                            </label>
+                            <label className="text-sm font-medium">Location</label>
                             <Input
                               name="location"
                               value={formData.location}
@@ -305,7 +299,7 @@ const Profile = () => {
                   </div>
 
                   {/* User Info */}
-                  <div className="flex-1 space-y-4 text-center sm:text-left">
+                  <div className="flex-1 space-y-4 text-center sm:text-left mt-6 sm:mt-0">
                     <div>
                       <h1 className="font-heading text-2xl sm:text-3xl font-bold">
                         {user?.name}
