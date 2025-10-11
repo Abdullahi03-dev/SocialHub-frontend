@@ -279,7 +279,7 @@ export default function PostCard({ post }: PostCardProps) {
         {post.image && (
           <div className="w-full flex justify-center">
             <img
-              src={post?.image ? `${API_URL}/${post.image}` : undefined}
+              src={post?.image ? `${post.image}` : undefined}
               alt="Post"
               className="rounded-lg w-full max-h-96 object-cover"
             />
