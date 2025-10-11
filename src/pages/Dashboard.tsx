@@ -231,38 +231,39 @@ const Dashboard = () => {
               </div>
 
               {/* Sidebar Content */}
-              <div className="space-y-6">
-                {/* Trending Topics */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <TrendingUp className="h-5 w-5 mr-2" />
-                      Trending HashTags
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {hashTagsAnalytics.map((tag, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <span className="font-medium">#{tag}</span>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
+              <div className="space-y-6 w-full max-w-full">
+  {/* Trending Topics */}
+  <Card className="w-full">
+    <CardHeader>
+      <CardTitle className="flex items-center">
+        <TrendingUp className="h-5 w-5 mr-2" />
+        Trending HashTags
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-3">
+      {hashTagsAnalytics.map((tag, index) => (
+        <div key={index} className="flex items-center justify-between">
+          <span className="font-medium">#{tag}</span>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
 
-                {/* Quick Stats */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Active Users</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {activeUsers.map((user: any) => (
-                      <div key={user.id} className="flex justify-between">
-                        <span>{user.name}</span>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </div>
+  {/* Quick Stats */}
+  <Card className="w-full">
+    <CardHeader>
+      <CardTitle>Active Users</CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-3">
+      {activeUsers.map((user: any) => (
+        <div key={user.id} className="flex justify-between">
+          <span>{user.name}</span>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
+</div>
+
             </div>
           </div>
         </main>
