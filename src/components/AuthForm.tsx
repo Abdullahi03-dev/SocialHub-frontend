@@ -63,9 +63,8 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
     if (!validateForm()) return;
     setIsLoading(true);
     
-    // Simulate API call
     setTimeout(() => {
-      setIsLoading(false);
+      // setIsLoading(false);
       if (onAuth) {
         onAuth(formData.email, formData.password, formData.username, mode === 'login');
       }
