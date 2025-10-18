@@ -63,12 +63,12 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
     if (!validateForm()) return;
     setIsLoading(true);
     
-    // setTimeout(() => {
+    setTimeout(() => {
       setIsLoading(false);
       if (onAuth) {
         onAuth(formData.email, formData.password, formData.username, mode === 'login');
       }
-    // }, 1000);
+    }, 1000);
   };
 
 
