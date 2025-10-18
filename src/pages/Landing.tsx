@@ -116,7 +116,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="py-20 bg-gradient-subtle">
+      <section className="py-20 bg-gradient-subtle flex justify-center items-center">
         <div className="container">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why Choose SocialHub?</h2>
@@ -125,7 +125,7 @@ const Landing = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 px-3">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 px-3 justify-center items-center">
             {features.map((feature, index) => (
               <Card key={index} className="card-interactive hover-lift">
                 <CardContent className="p-6 text-center">
