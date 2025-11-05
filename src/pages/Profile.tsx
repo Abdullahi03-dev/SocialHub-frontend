@@ -58,7 +58,7 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const savedEmail = localStorage.getItem("email");
+  const savedEmail = localStorage.getItem("token");
 
   // Fetch user profile + posts
   useEffect(() => {
@@ -70,7 +70,7 @@ const Profile = () => {
     const fetchUserAndPosts = async () => {
       try {
         const userRes = await axios.get(`${API_URL}/auth/fetchbyemail`, {
-          params: { email: savedEmail },
+          headers: { Authorization:`Bearer ${savedEmail}` },
           withCredentials: true,
         });
         setUser(userRes.data);
@@ -81,8 +81,11 @@ const Profile = () => {
         });
 
         const postsRes = await axios.get(
-          `${API_URL}/getallpostsForUser/${savedEmail}`,
-          { withCredentials: true }
+          `${API_URL}/getallpostsForUser/`,
+          {headers:{
+            Authorization:`Bearer ${savedEmail}`
+
+          } ,withCredentials: true }
         );
         setPosts(postsRes.data);
       } catch (err) {
@@ -117,10 +120,10 @@ const Profile = () => {
 
     try {
       await axios.put(
-        `${API_URL}/edit/editImage/${savedEmail}/upload-image`,
+        `${API_URL}/edit/editImage/upload-image`,
         uploadForm,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {Authorization:`Bearer ${savedEmail}` ,"Content-Type": "multipart/form-data" },
         }
       );
       toast.success("Image uploaded successfully");
@@ -184,7 +187,7 @@ const Profile = () => {
       <div className="flex">
         {/* Sidebar */}
         <aside
-          className="fixed top-0 left-0 h-screen bg-white border-r shadow-sm
+          className="fixed top-20 left-0 h-screen bg-white border-r shadow-sm
                      w-16 sm:w-20 md:w-24 lg:w-64 flex flex-col"
         >
           <Sidebar />
@@ -366,9 +369,9 @@ const Profile = () => {
                     <PostCard
                       key={post.id}
                       post={post}
-                      email={savedEmail || ""}
-                      onLike={(id) => console.log("Like", id)}
-                      onComment={(id, c) => console.log("Comment", id, c)}
+                      // email={savedEmail || ""}
+                      // onLike={(id) => console.log("Like", id)}
+                      // onComment={(id, c) => console.log("Comment", id, c)}
                     />
                   ))}
                 </div>

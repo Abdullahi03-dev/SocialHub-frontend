@@ -1,22 +1,22 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {  LogOut } from "lucide-react";
-import axios from "axios";
+// import axios from "axios";
 import toast from "react-hot-toast";
 interface HeaderProps {
   isAuthenticated?: boolean;
   onLogout?: () => void;
 }
 const Header = ({ isAuthenticated = false }: HeaderProps) => {
-  const API_URL=import.meta.env.VITE_API_URL
+  // const API_URL=import.meta.env.VITE_API_URL
   const navigate = useNavigate();
   const location = useLocation();
 
 
   const logout = async () => {
     try {
-      await axios.post(`${API_URL}`, {}, { withCredentials: true });
-      localStorage.removeItem('email')
+      // await axios.post(`${API_URL}`, {}, { withCredentials: true });
+      localStorage.removeItem('token')
       toast.success("Logged out successfully");
       setTimeout(()=>{
         navigate(0)

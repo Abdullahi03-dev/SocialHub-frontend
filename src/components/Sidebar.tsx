@@ -3,7 +3,7 @@ import {
   LayoutDashboard, 
   Users, 
   User, 
-  Settings
+  // Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -11,7 +11,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Users", href: "/users", icon: Users },
   { name: "Profile", href: "/profile", icon: User },
-  { name: "Settings", href: "/settings", icon: Settings },
+  // { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 const Sidebar = () => {
