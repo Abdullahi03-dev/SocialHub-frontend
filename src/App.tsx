@@ -11,7 +11,7 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/protectedRoute";
 import NotFound from "./pages/NotFound";
 import {Toaster} from 'react-hot-toast'
-import Single_page_user from './pages/single_page_user'
+// import Single_page_user from './pages/single_page_user'
 
 
 // const queryClient = new QueryClient();
@@ -40,11 +40,11 @@ const App = () => (
          
           }
           />
-          <Route path="/singlepage/:savedEmail" element={
+          {/* <Route path="/singlepage/:savedEmail" element={
             <ProtectedRoute>
               <Single_page_user />
             </ProtectedRoute>
-          } />
+          } /> */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
