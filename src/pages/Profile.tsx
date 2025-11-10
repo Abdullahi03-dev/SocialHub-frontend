@@ -81,7 +81,7 @@ const Profile = () => {
         });
 
         const postsRes = await axios.get(
-          `${API_URL}/getallpostsForUser/`,
+          `${API_URL}/getallpostsForUser`,
           {headers:{
             Authorization:`Bearer ${savedEmail}`
 

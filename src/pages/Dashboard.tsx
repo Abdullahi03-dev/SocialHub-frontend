@@ -44,7 +44,7 @@ const Dashboard = () => {
 
   const token = localStorage.getItem("token");
 
-  // ✅ Axios instance with JWT header
+  // Axios instance with JWT header
   const axiosAuth = axios.create({
     baseURL: API_URL,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -77,12 +77,12 @@ const Dashboard = () => {
   // Fetch posts (authenticated)
   const fetchPosts = async () => {
     try {
-      const res = await axiosAuth.get("/getallpostsForUser/");
+      const res = await axiosAuth.get("/getallposts");
       setPosts(res.data);
     } catch (err) {
       console.error(err);
       toast.error("Session expired. Please login again.");
-      navigate("/auth");
+      // navigate("/auth");
     }
   };
 

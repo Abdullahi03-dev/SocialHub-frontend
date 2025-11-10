@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Mail, Calendar } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 interface UserData {
   id: string;
@@ -30,7 +30,7 @@ const UserCard = ({
   variant = "card",
   isAdmin,
 }: UserCardProps) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleDelete = () => {
     if (onDelete) {
@@ -43,9 +43,9 @@ const UserCard = ({
     return (
       <tr
         className="border-b border-border hover:bg-secondary/50 transition-smooth cursor-pointer"
-        onClick={() => {
-          navigate("/singlepage/" + user.id);
-        }}
+        // onClick={() => {
+        //   navigate("/singlepage/" + user.id);
+        // }}
       >
         <td className="py-4 px-6">
           <div className="flex items-center space-x-3">

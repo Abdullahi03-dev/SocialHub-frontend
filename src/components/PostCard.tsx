@@ -293,7 +293,150 @@
 
 
 
-import { useState } from "react";
+// import { useState } from "react";
+// import axios from "axios";
+// import {
+//   Card,
+//   CardContent,
+//   CardHeader,
+// } from "@/components/ui/card";
+// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// import { Badge } from "@/components/ui/badge";
+// import { Button } from "@/components/ui/button";
+// import { Heart } from "lucide-react";
+// import toast from "react-hot-toast";
+
+// interface PostCardProps {
+//   post: Post;
+// }
+
+// interface Post {
+//   id: string;
+//   author: string;
+//   avatar: string;
+//   content: string;
+//   image?: string;
+//   created_at: string;
+//   likes: number;
+//   hashtags?: string;
+//   user: User;
+// }
+
+// interface User {
+//   name: string;
+//   role: string;
+//   image: string;
+// }
+
+// const API_URL = import.meta.env.VITE_API_URL;
+
+// export default function PostCard({ post }: PostCardProps) {
+//   const [likeCount, setLikeCount] = useState(post.likes || 0);
+//   const [liked, setLiked] = useState(false);
+//   const token = localStorage.getItem("token");
+
+//   const handleLike = async () => {
+//     if (!token) {
+//       toast.error("Please login again to like posts.");
+//       return;
+//     }
+
+//     try {
+//       const res = await axios.post(
+//         `${API_URL}/posts/${post.id}/like`,
+//         {},
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//         }
+//       );
+
+//       // ✅ Update state based on backend response
+//       if (res.data.message === "Liked") {
+//         setLiked(true);
+//         setLikeCount((prev) => prev + 1);
+//       } else if (res.data.message === "Unliked") {
+//         setLiked(false);
+//         setLikeCount((prev) => prev - 1);
+//       }
+//     } catch (error) {
+//       console.error(error);
+//       toast.error("Something went wrong while liking the post.");
+//     }
+//   };
+
+//   // Fix image handling (Cloudinary + local)
+//   const getImageUrl = (image?: string) => {
+//     if (!image) return undefined;
+//     if (image.startsWith("http")) return image; // already full URL
+//     return `${API_URL}/${image.replace(/^\/+/, "")}`;
+//   };
+
+//   return (
+//     <Card className="card-post hover-lift w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto">
+//       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pb-4">
+//         <Avatar className="h-10 w-10">
+//           <AvatarImage
+//             src={getImageUrl(post.user?.image)}
+//             alt={post.user?.name}
+//           />
+//           {post.user?.name && (
+//             <AvatarFallback className="gradient-primary font-bold">
+//               {post.user.name.charAt(0).toUpperCase()}
+//               {post.user.name.charAt(1)?.toUpperCase()}
+//             </AvatarFallback>
+//           )}
+//         </Avatar>
+
+//         <div className="flex-1">
+//           <h4 className="font-semibold text-sm sm:text-base">{post.user.name}</h4>
+//           <Badge
+//             variant={post.user.role === "admin" ? "default" : "secondary"}
+//             className={post.user.role === "admin" ? "gradient-primary text-white" : ""}
+//           >
+//             {post.user.role}
+//           </Badge>
+//         </div>
+//       </CardHeader>
+
+//       <CardContent className="space-y-4">
+//         <p className="text-sm sm:text-base break-words">{post.content}</p>
+
+//         {post.image && (
+//           <div className="w-full flex justify-center">
+//             <img
+//               src={getImageUrl(post.image)}
+//               alt="Post"
+//               className="rounded-lg w-full max-h-96 object-cover"
+//             />
+//           </div>
+//         )}
+
+//         <div className="flex items-center justify-between mt-2">
+//           <Button
+//             variant={liked ? "default" : "outline"}
+//             className="flex items-center gap-2"
+//             onClick={handleLike}
+//           >
+//             <Heart
+//               className={`h-4 w-4 ${liked ? "text-red-500 fill-red-500" : ""}`}
+//             />
+//             {likeCount}
+//           </Button>
+//           <span className="text-xs text-muted-foreground">
+//             {new Date (post.created_at).toLocaleTimeString()}
+//           </span>
+//         </div>
+//       </CardContent>
+//     </Card>
+//   );
+// }
+
+
+
+
+import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Card,
@@ -335,6 +478,22 @@ export default function PostCard({ post }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const token = localStorage.getItem("token");
 
+  // ✅ Check if the user already liked this post when component mounts
+  useEffect(() => {
+    if (!token) return;
+    const checkIfLiked = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/getLiked/${post.id}/liked`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setLiked(res.data.liked);
+      } catch (err) {
+        console.error("Failed to check liked status", err);
+      }
+    };
+    checkIfLiked();
+  }, [post.id, token]);
+
   const handleLike = async () => {
     if (!token) {
       toast.error("Please login again to like posts.");
@@ -346,19 +505,16 @@ export default function PostCard({ post }: PostCardProps) {
         `${API_URL}/posts/${post.id}/like`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // ✅ Update state based on backend response
       if (res.data.message === "Liked") {
         setLiked(true);
-        setLikeCount((prev) => prev + 1);
+        setLikeCount(res.data.likes);
       } else if (res.data.message === "Unliked") {
         setLiked(false);
-        setLikeCount((prev) => prev - 1);
+        setLikeCount(res.data.likes);
       }
     } catch (error) {
       console.error(error);
@@ -366,10 +522,9 @@ export default function PostCard({ post }: PostCardProps) {
     }
   };
 
-  // Fix image handling (Cloudinary + local)
   const getImageUrl = (image?: string) => {
     if (!image) return undefined;
-    if (image.startsWith("http")) return image; // already full URL
+    if (image.startsWith("http")) return image;
     return `${API_URL}/${image.replace(/^\/+/, "")}`;
   };
 
@@ -377,10 +532,7 @@ export default function PostCard({ post }: PostCardProps) {
     <Card className="card-post hover-lift w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto">
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pb-4">
         <Avatar className="h-10 w-10">
-          <AvatarImage
-            src={getImageUrl(post.user?.image)}
-            alt={post.user?.name}
-          />
+          <AvatarImage src={getImageUrl(post.user?.image)} alt={post.user?.name} />
           {post.user?.name && (
             <AvatarFallback className="gradient-primary font-bold">
               {post.user.name.charAt(0).toUpperCase()}
@@ -419,13 +571,11 @@ export default function PostCard({ post }: PostCardProps) {
             className="flex items-center gap-2"
             onClick={handleLike}
           >
-            <Heart
-              className={`h-4 w-4 ${liked ? "text-red-500 fill-red-500" : ""}`}
-            />
+            <Heart className={`h-4 w-4 ${liked ? "text-red-500 fill-red-500" : ""}`} />
             {likeCount}
           </Button>
           <span className="text-xs text-muted-foreground">
-            {new Date (post.created_at).toLocaleTimeString()}
+            {new Date(post.created_at).toLocaleTimeString()}
           </span>
         </div>
       </CardContent>
