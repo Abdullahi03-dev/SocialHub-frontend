@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from "lucide-react";
 
 interface AuthFormProps {
-  onAuth?: (email: string, password: string, username: string, isLogin: boolean) => void;
+  onAuth?: (email: string, password: string, username: string, isLogin: boolean) => Promise<void>;
 }
 
 const AuthForm = ({ onAuth }: AuthFormProps) => {
@@ -61,14 +61,17 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    setIsLoading(true);
     
-    setTimeout(() => {
-      setIsLoading(false);
-      if (onAuth) {
-        onAuth(formData.email, formData.password, formData.username, mode === 'login');
+    if (onAuth) {
+      setIsLoading(true);
+      try {
+        await onAuth(formData.email, formData.password, formData.username, mode === 'login');
+      } catch (error) {
+        console.error('Auth error:', error);
+      } finally {
+        setIsLoading(false);
       }
-    }, 1000);
+    }
   };
 
 
@@ -132,6 +135,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                     value={formData.username}
                     onChange={(e) => handleInputChange('username', e.target.value)}
                     className="pl-10 input-field"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -150,6 +154,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   className="pl-10 input-field"
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -167,6 +172,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   className="pl-10 pr-10 input-field"
+                  disabled={isLoading}
                 />
                 <Button
                   type="button"
@@ -174,6 +180,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                   size="sm"
                   className="absolute right-2 top-2 h-6 w-6 p-0"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
@@ -194,6 +201,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                     className="pl-10 pr-10 input-field"
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -201,6 +209,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                     size="sm"
                     className="absolute right-2 top-2 h-6 w-6 p-0"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={isLoading}
                   >
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
@@ -225,6 +234,7 @@ const AuthForm = ({ onAuth }: AuthFormProps) => {
                 variant="link"
                 onClick={toggleMode}
                 className="ml-1 text-primary font-medium"
+                disabled={isLoading}
               >
                 {mode === 'login' ? 'Sign up' : 'Sign in'}
               </Button>

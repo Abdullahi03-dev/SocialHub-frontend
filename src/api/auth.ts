@@ -5,7 +5,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const register = async (name: string, email: string, password: string) => {
   try {
     const res = await axios.post(`${API_URL}/auth/signup`, { name, email, password }, {
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
+      withCredentials: true
     });
     return res.data;
   } catch (e: any) {
@@ -15,7 +16,9 @@ export const register = async (name: string, email: string, password: string) =>
 
 export const login = async (email: string, password: string) => {
   try {
-    const res = await axios.post(`${API_URL}/auth/signin`, { email, password });
+    const res = await axios.post(`${API_URL}/auth/signin`, { email, password }, {
+      withCredentials: true
+    });
     const data = res.data;
     localStorage.setItem("token", data.access_token); // ✅ Save token in localStorage
     return data;
@@ -33,6 +36,7 @@ export const checkAuth = async (): Promise<boolean> => {
       headers: {
         Authorization: `Bearer ${token}`, // ✅ send token here
       },
+      withCredentials: true
     });
     return res.data.authenticated;
   } catch {
